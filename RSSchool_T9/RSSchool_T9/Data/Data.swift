@@ -44,7 +44,9 @@ struct FillingData {
         .story(Story(coverImage: .init("story-4"), title: .from("s4-title"), text: .from("s4-text"), paths: [.story4path1, .story4path2])),
         .gallery(Gallery(coverImage: .init("code-0"), title: "Code stuff", images: .init(base: "code", count: 10))),
         .gallery(Gallery(coverImage: .init("tesla-0"), title: "Tesla", images: .init(base: "tesla", count: 8))),
-        .story(Story(coverImage: .init("story-3"), title: .from("s3-title"), text: .from("s3-text"), paths: [.story3path1, .story3path1, .story3path1, .story3path1]))
+        .story(Story(coverImage: .init("story-3"), title: .from("s3-title"), text: .from("s3-text"), paths: [.story3path1, .story3path1, .story3path1, .story3path1])),
+        .story(Story(coverImage: .init("story-5"), title: .from("s5-title"), text: .from("s5-text"), paths: [.story5path1, .story5path2, .story5path3])),
+        .gallery(Gallery(coverImage: .init("surfing-0"), title: "Surfing", images: .init(base: "surfing", count: 6)))
     ]
 }
 
@@ -62,3 +64,22 @@ struct Gallery {
     let images: [UIImage]
     let type: String = String(describing: Gallery.self)
 }
+
+@objc class StoriesSettings: NSObject {
+    @objc var isAnimated: Bool
+    @objc var drawColor: UIColor {
+        return UIColor.init(hexString: colorHexName)
+    }
+    @objc var colorHexName: String
+    @objc var availableColors: [String]
+    
+    override init() {
+        self.isAnimated = true
+        self.colorHexName = "#f3af22"
+        self.availableColors = ["#be2813", "#3802da", "#467c24", "#808080",
+                                "#8e5af7", "#f07f5a", "#f3af22", "#3dacf7",
+                                "#e87aa4", "#0f2e3f", "#213711", "#511307", "#92003b"]
+        super.init()
+    }
+}
+
