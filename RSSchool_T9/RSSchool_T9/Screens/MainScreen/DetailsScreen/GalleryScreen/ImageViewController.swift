@@ -30,12 +30,15 @@ class ImageViewController: UIViewController {
         view.delegate = self
         view.showsVerticalScrollIndicator = false
         view.showsHorizontalScrollIndicator = false
+        view.minimumZoomScale = 1
+        view.maximumZoomScale = 3
         return view
     }()
     
     private lazy var imageView: UIImageView = {
         let image = UIImageView(image: image)
         image.translatesAutoresizingMaskIntoConstraints = false
+        image.contentMode = .scaleAspectFit
         return image
     }()
     
@@ -67,19 +70,10 @@ class ImageViewController: UIViewController {
         setupSubviews()
     }
     
-    override func viewDidLayoutSubviews() {
-        minZoomScale()
-    }
-    
     func setupSubviews() {
         self.view.addSubview(imageScrollView)
         imageScrollView.addSubview(imageView)
         self.view.addSubview(closeBtn)
-        
-        top = imageView.topAnchor.constraint(equalTo: imageScrollView.topAnchor)
-        left = imageView.leftAnchor.constraint(equalTo: imageScrollView.leftAnchor)
-        right = imageView.rightAnchor.constraint(equalTo: imageScrollView.rightAnchor)
-        bottom = imageView.bottomAnchor.constraint(equalTo: imageScrollView.bottomAnchor)
         
         NSLayoutConstraint.activate([
             closeBtn.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 30),
@@ -87,37 +81,22 @@ class ImageViewController: UIViewController {
             closeBtn.heightAnchor.constraint(equalToConstant: 40),
             closeBtn.widthAnchor.constraint(equalToConstant: 40),
             
-            imageScrollView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 0),
-            imageScrollView.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 0),
-            imageScrollView.rightAnchor.constraint(equalTo: self.view.rightAnchor, constant: 0),
-            imageScrollView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: 0),
+            imageScrollView.frameLayoutGuide.topAnchor.constraint(equalTo: self.view.topAnchor),
+            imageScrollView.frameLayoutGuide.leftAnchor.constraint(equalTo: self.view.leftAnchor),
+            imageScrollView.frameLayoutGuide.rightAnchor.constraint(equalTo: self.view.rightAnchor),
+            imageScrollView.frameLayoutGuide.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
             
-            top, left, right, bottom
+            imageScrollView.contentLayoutGuide.topAnchor.constraint(equalTo: imageScrollView.frameLayoutGuide.topAnchor),
+            imageScrollView.contentLayoutGuide.leftAnchor.constraint(equalTo: imageScrollView.frameLayoutGuide.leftAnchor),
+            imageScrollView.contentLayoutGuide.rightAnchor.constraint(equalTo: imageScrollView.frameLayoutGuide.rightAnchor),
+            imageScrollView.contentLayoutGuide.bottomAnchor.constraint(equalTo: imageScrollView.frameLayoutGuide.bottomAnchor),
+            
+            imageView.topAnchor.constraint(equalTo: imageScrollView.contentLayoutGuide.topAnchor),
+            imageView.leftAnchor.constraint(equalTo: imageScrollView.contentLayoutGuide.leftAnchor),
+            imageView.rightAnchor.constraint(equalTo: imageScrollView.contentLayoutGuide.rightAnchor),
+            imageView.bottomAnchor.constraint(equalTo: imageScrollView.contentLayoutGuide.bottomAnchor)
+            
         ])
-    }
-    
-    private func updateConstraints() {
-        let y = max(0, (self.view.bounds.height - imageView.frame.height) / 2)
-        top.constant = y
-        bottom.constant = y
-        
-        let x = max(0, (self.view.bounds.width - imageView.frame.width) / 2)
-        left.constant = x
-        right.constant = x
-        
-        self.view.layoutIfNeeded()
-    }
-    
-    private func minZoomScale() {
-        let bounds = self.view.bounds
-        let imageSize = imageView.bounds.size
-
-        let xScale = bounds.width / imageSize.width
-        let yScale = bounds.height / imageSize.height
-        let minScale = min(xScale, yScale)
-        self.imageScrollView.minimumZoomScale = minScale
-        self.imageScrollView.maximumZoomScale = minScale * 3
-        self.imageScrollView.zoomScale = minScale
     }
     
     @objc private func closeOnTap() {
@@ -135,16 +114,16 @@ class ImageViewController: UIViewController {
         } completion: { _ in
             self.closeBtn.isHidden = !self.closeBtn.isHidden
         }
-
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        imageScrollView.zoomScale = 1
     }
 }
 
 extension ImageViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return self.imageView
-    }
-    
-    func scrollViewDidZoom(_ scrollView: UIScrollView) {
-       updateConstraints()
     }
 }
