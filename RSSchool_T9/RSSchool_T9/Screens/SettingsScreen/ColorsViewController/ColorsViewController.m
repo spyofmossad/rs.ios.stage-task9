@@ -41,7 +41,7 @@
 }
 
 -(void)switchTableScrolling {
-    if (UIDevice.currentDevice.orientation == UIDeviceOrientationPortrait) {
+    if (UIDevice.currentDevice.orientation == UIDeviceOrientationPortrait && self.table.contentSize.height < self.view.bounds.size.height) {
         self.table.scrollEnabled = false;
     } else {
         self.table.scrollEnabled = true;
